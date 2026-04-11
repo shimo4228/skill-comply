@@ -52,14 +52,28 @@ uv run python -m scripts.run --dry-run ~/.claude/skills/search-first/SKILL.md
 uv run python -m scripts.run --gen-model haiku --model sonnet <path>
 ```
 
-## Real-World Results
+## Real-World Results (v0.2.0, post text-observability fix)
 
-| Target | Compliance | Insight |
-|--------|-----------|---------|
-| testing.md | 33% | Agents skip TDD when not prompted — hook candidate |
-| search-first | 27% | evaluate_candidates and make_decision at 0% across all scenarios |
-| security.md | dry-run OK | Spec + scenarios generated successfully |
-| git-workflow.md | dry-run OK | Spec + scenarios generated successfully |
+| Target | Overall | Supportive | Insight |
+|--------|:-:|:-:|---------|
+| testing.md | **73%** | **100%** | Observable 6-step TDD spec fully matches sonnet when explicitly instructed |
+| search-first | **56%** | **67%** | Text-based verdicts (Adopt/Extend/Build) now captured via Text pseudo-events |
+| security.md | dry-run OK | — | Spec + scenarios generated successfully |
+| git-workflow.md | dry-run OK | — | Spec + scenarios generated successfully |
+
+### v0.1.0 → v0.2.0 improvement
+
+| Target | v0.1.0 overall | v0.2.0 overall | Δ |
+|--------|:-:|:-:|:-:|
+| search-first | 8% | 56% | **+48** |
+| testing.md | 33% | 73% | **+40** |
+
+v0.1.0 systematically under-scored thinking-centric skills because the runner
+discarded assistant text blocks and the spec generator was free to emit
+cognitive-only steps (`evaluate_findings`, `state_verdict`) that no tool call
+could satisfy. After a downstream `after_step` dependency, cascading failures
+nullified observable steps as well. v0.2.0 fixes both layers — see
+[CHANGELOG.md](CHANGELOG.md).
 
 ## Requirements
 
@@ -70,7 +84,7 @@ uv run python -m scripts.run --gen-model haiku --model sonnet <path>
 ## Tests
 
 ```bash
-cd skills/skill-comply && uv run pytest -v  # 25 tests
+cd skills/skill-comply && uv run pytest -v  # 32 tests
 ```
 
 ## License

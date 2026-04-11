@@ -22,3 +22,19 @@ Rules:
 - A Bash running "pytest" that outputs "passed" is a GREEN phase test run
 - Each tool call should match at most one step (pick the best match)
 - If a tool call doesn't match any step, don't include it
+
+Text pseudo-tool:
+- A `Text` entry is NOT a real tool call — it's assistant natural-language
+  output (reasoning, narration, conclusions). Its `output` field holds the text;
+  `input` is empty.
+- Match a Text entry to a step ONLY when the step's detector explicitly mentions
+  "assistant text output" or describes a verdict / evaluation / plan statement.
+- For verdict-style steps ("Adopt X", "Extend Y", "Compose A+B", "Build custom"),
+  match a Text entry whose content contains one of these keywords followed by a
+  library or approach name, OR a clear commitment like "I'll use X because...".
+- For evaluation-style steps, match a Text entry that discusses trade-offs,
+  compares candidates, or weighs pros and cons.
+- Do NOT match Text to tool-call steps like "Write a test file" or "run pytest"
+  — those must match actual tool_use events.
+- If no step mentions text output and no Text entry is a clear verdict, leave
+  all Text entries unmatched.
