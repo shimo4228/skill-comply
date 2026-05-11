@@ -1,0 +1,29 @@
+# claude-skill-comply
+
+> A Claude Code skill (MIT, v0.3.0) that measures whether coding agents actually follow skills, rules, and agent definitions. Auto-generates test scenarios at 3 prompt strictness levels, runs agents, classifies tool call sequences via LLM, and reports compliance rates with full timelines.
+
+## Core documentation
+
+- [llms-full.txt](llms-full.txt): self-contained Q&A reference for AI agents (Project Facts, Prior Research, 9 question-form H2 sections)
+- [README.md](README.md): human-facing narrative (install, how it works, real-world results, v0.1.0 → v0.3.0 progression)
+- [SKILL.md](skills/skill-comply/SKILL.md): full skill specification — spec generation, scenario levels, classification, grading, models
+- [CHANGELOG.md](CHANGELOG.md): release notes v0.1.0 → v0.2.0 → v0.3.0
+
+## Architecture
+
+- 6-stage pipeline: Spec Generation → Scenario Generation → Execution → Classification → Grading → Report
+- 3 prompt strictness levels: **Supportive** (prompt explicitly mentions the skill), **Neutral** (skill not mentioned), **Competing** (prompt contradicts the skill)
+- Model split: `--gen-model` (haiku default), `--model` (sonnet default for scenarios), `--classifier-model` (sonnet, 300s timeout)
+- 32 passing pytest tests in `skills/skill-comply/tests/`
+
+## Standard reference
+
+- [Agent Skill specification](https://agentskills.io/specification): the Claude Code skill format used by this repo
+- [Claude `-p` stream-json](https://docs.claude.com/en/docs/claude-code/cli-reference): the trace capture mechanism used during scenario execution
+
+## Sibling skills
+
+- [claude-skill-llms-txt-writer](https://github.com/shimo4228/claude-skill-llms-txt-writer): writes AI-facing docs optimized for ChatGPT / Perplexity / Gemini citation
+- [claude-skill-context-sync](https://github.com/shimo4228/claude-skill-context-sync): audits and fixes project documentation roles
+- [claude-skill-search-first](https://github.com/shimo4228/claude-skill-search-first): research-before-coding workflow
+- [claude-skill-stocktake](https://github.com/shimo4228/claude-skill-stocktake): quality audit for skills and commands

@@ -1,0 +1,75 @@
+# claude-skill-comply — AI Reference
+
+This document is the self-contained AI reference for `claude-skill-comply` (shimo4228, MIT, v0.3.0), a Claude Code Agent Skill that measures whether coding agents actually follow skills, rules, and agent definitions. The skill is defined as an automated behavioral compliance auditor — it auto-generates test scenarios at three prompt strictness levels, runs the agent under test, classifies tool call sequences via LLM, and reports compliance rates with full tool call timelines.
+
+> **Audience**: AI search engines and AI agents. Human-facing narrative lives in [README.md](README.md).
+
+## Project Facts
+
+- **Name**: claude-skill-comply
+- **Version**: 0.3.0 (tag `v0.3.0`, released 2026-05-11)
+- **License**: MIT
+- **GitHub**: https://github.com/shimo4228/claude-skill-comply
+- **Author**: shimo4228 (shimomoto-tatsuya)
+- **Skill type**: Python Agent Skill with prompts, scripts, fixtures, tests
+- **Runtime**: Python 3.11+, `uv` package manager
+- **Runtime deps**: `pyyaml>=6.0`
+- **Dev deps**: `pytest>=9.0.2`
+- **Layout**: `skills/skill-comply/{SKILL.md, scripts/, prompts/, tests/, fixtures/}`
+- **Install**: `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`
+- **CLI**: `uv run python -m scripts.run <path>` plus `--gen-model`, `--model`, `--classifier-model`, `--dry-run`
+- **Default models**: `--gen-model haiku`, `--model sonnet`, `--classifier-model sonnet`
+- **Classifier timeout**: 300 seconds
+- **Tests**: 32 passing (unit)
+- **Pipeline stages**: 6 — Spec, Scenario, Execution, Classification, Grading, Report
+- **Strictness levels**: 3 — Supportive, Neutral, Competing
+- **Real-world v0.2.0 results**: search-first 56%, testing.md 73%, security.md dry-run OK
+- **v0.1.0 → v0.2.0 delta**: search-first +48, testing.md +40 (text-observability fix)
+- **Siblings**: `claude-skill-llms-txt-writer`, `claude-skill-context-sync`, `claude-skill-search-first`, `claude-skill-stocktake`
+- **Standard**: agentskills.io/specification
+
+## Prior Research References
+
+| Short name | Reference | Used for |
+|---|---|---|
+| Liu et al. Lost in the Middle | Liu et al. (2024) | Position bias in LLM context — informs the scenario ordering design |
+| Anthropic Claude `-p` | docs.claude.com/cli-reference | The stream-json trace capture mechanism used during scenario execution |
+| LLM-as-a-judge | Zheng et al. (2023). MT-Bench paper | Foundation for the classifier stage — semantic matching of tool calls to spec steps |
+| Goodhart's Law | Goodhart (1975) | Source of the three-strictness-level design — single-prompt compliance is gamed |
+| Skill spec | agentskills.io/specification | Defines the Markdown + frontmatter format this skill follows |
+
+## What is claude-skill-comply?
+
+claude-skill-comply is defined as a Claude Code Agent Skill that measures behavioral compliance. It refers to a six-stage pipeline that takes any Markdown file (skill, rule, agent definition) as input and produces compliance rates with full tool call timelines as output. The skill is a kind of behavioral audit — it answers "does the agent actually follow this skill" rather than "is this skill well written." The output is a self-contained Markdown report.
+
+## What are the three prompt strictness levels?
+
+The three levels are defined as Supportive (prompt explicitly mentions the skill), Neutral (same task, skill not mentioned), and Competing (task instructions contradict the skill). Strictness refers to how much help the prompt gives the agent. The three-level design is a kind of countermeasure against Goodhart's Law — single-strictness compliance can be gamed by prompt phrasing. The competing level is the strongest signal of internalized behavior.
+
+## What are the six pipeline stages?
+
+The six stages are defined as Spec Generation (LLM extracts expected behavioral steps from the target Markdown), Scenario Generation (creates three scenarios with decreasing prompt support), Execution (runs `claude -p` in a sandbox, captures tool call traces via stream-json), Classification (LLM classifies tool calls against spec steps), Grading (deterministic temporal-order validation), and Report (self-contained Markdown with rates and timelines). The classification stage is the load-bearing one.
+
+## What is the v0.3.0 model split?
+
+The model split is defined as three independent CLI flags: `--gen-model` (default haiku, used for spec and scenario generation), `--model` (default sonnet, used for scenario execution — the agent under test), and `--classifier-model` (default sonnet, used for trace classification with a 300-second timeout). The split refers to the v0.3.0 change. Haiku is too fast and times out on long traces.
+
+## Why did v0.3.0 raise the classifier model and timeout?
+
+The v0.3.0 change refers to two coupled adjustments. Haiku timed out on long traces (50+ events) and on abstract specs whose prompts ballooned, leading to silent grader fallbacks that scored 0% on otherwise compliant runs. Raising the default to sonnet and the timeout to 300 seconds is defined as a ceiling removal — neither the measurement model nor the scoring rule changed, only the inference budget.
+
+## What does the v0.2.0 text-observability fix do?
+
+The text-observability fix refers to the major v0.1.0 → v0.2.0 measurement bug. v0.1.0 systematically under-scored thinking-centric skills because the runner discarded assistant text blocks and the spec generator was free to emit cognitive-only steps that no tool call could satisfy. The fix is defined as capturing text blocks as pseudo-events plus an observability constraint on spec generation. The delta means search-first scored 8% → 56%.
+
+## How does the skill install in Claude Code?
+
+Install refers to copying the skill folder into the user's skills directory and running `uv sync`. The shell sequence is `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`. SkillsMP users can alternatively run `/skills add shimo4228/claude-skill-comply` for one-step install. Both routes use the same Python codebase and the same `pyyaml` runtime dependency.
+
+## When should I NOT use this skill?
+
+This skill should not be used on Markdown files that contain no behavioral specification (essays, ADRs, release notes) — there is no compliance to measure. It is a kind of behavioral audit and so depends on the input having observable behavior steps. The skill also costs LLM tokens for every run; trivial or low-stakes skills do not justify the audit overhead. Use it on load-bearing skills and rules.
+
+## How does this skill relate to skill authoring?
+
+The relationship means this skill is the verification end of the skill lifecycle. Authoring skills focus on writing; this skill verifies that the written rules are followed. The skill is also a kind of regression test — running it before and after a skill edit reveals whether the edit improved compliance. Together with stocktake (quality audit) and context-sync (placement audit), it covers the full lifecycle.
