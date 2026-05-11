@@ -1,7 +1,7 @@
 ---
 name: skill-comply
 description: Visualize whether skills, rules, and agent definitions are actually followed — auto-generates scenarios at 3 prompt strictness levels, runs agents, classifies behavioral sequences, and reports compliance rates with full tool call timelines
-origin: original
+origin: shimo4228
 tools: Read, Bash
 ---
 
@@ -38,8 +38,16 @@ uv run python -m scripts.run ~/.claude/rules/common/testing.md
 uv run python -m scripts.run --dry-run ~/.claude/skills/search-first/SKILL.md
 
 # Custom models
-uv run python -m scripts.run --gen-model haiku --model sonnet <path>
+uv run python -m scripts.run --gen-model haiku --model sonnet --classifier-model sonnet <path>
 ```
+
+## Models
+
+| Stage | Default | Why |
+|-------|---------|-----|
+| `--gen-model` | `haiku` | Spec / scenario generation. Short prompts, fast. |
+| `--model` | `sonnet` | Scenario execution (the agent under test). |
+| `--classifier-model` | `sonnet` | Trace classification. Haiku times out on long traces (50+ events) and abstract specs (e.g. contemplative-axioms). Sonnet handles the load with a 300s timeout. |
 
 ## Key Concept: Prompt Independence
 

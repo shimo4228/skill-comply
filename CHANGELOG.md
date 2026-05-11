@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] — 2026-05-11
+
+### Added
+
+- **`--classifier-model` CLI flag** (`scripts/run.py`) — explicit model selection
+  for the grading/classification stage, decoupled from `--gen-model` and
+  `--model`. Default: `sonnet`.
+- **`## Models` table in `SKILL.md`** — documents which model is recommended at
+  each stage (spec generation, scenario execution, trace classification) and why.
+
+### Changed
+
+- **Classifier default model: `haiku` → `sonnet`** (`scripts/classifier.py`,
+  `scripts/grader.py`). Haiku times out on long traces (50+ events) and on
+  abstract specs whose prompts balloon (e.g. `contemplative-axioms.md`). Sonnet
+  handles the load within budget.
+- **Classifier timeout: `60s` → `300s`** (`scripts/classifier.py` —
+  `CLASSIFIER_TIMEOUT_SECONDS = 300`). Required for sonnet to complete
+  classification of complex multi-step traces without false negatives from
+  premature termination.
+- **`SKILL.md` frontmatter `origin: original → shimo4228`** — aligns with the
+  upstream origin-tracking convention.
+
+### Why
+
+The bottleneck on v0.2.0 was not measurement accuracy but **classifier reach**:
+abstract specs (contemplative-axioms, agentic-engineering) routinely produced
+20+ step prompts that haiku couldn't process inside 60 seconds, leading to
+silent grader fallbacks that scored 0% on otherwise compliant runs. Raising
+both default model and timeout removes that ceiling without changing the
+measurement model itself.
+
 ## [0.2.0] — 2026-04-11
 
 ### Fixed — Text-observability (major measurement bug)
