@@ -25,7 +25,7 @@ This document is the self-contained AI reference for `claude-skill-comply` (shim
 - **Strictness levels**: 3 — Supportive, Neutral, Competing
 - **Real-world v0.2.0 results**: search-first 56%, testing.md 73%, security.md dry-run OK
 - **v0.1.0 → v0.2.0 delta**: search-first +48, testing.md +40 (text-observability fix)
-- **Siblings**: `claude-skill-llms-txt-writer`, `claude-skill-context-sync`, `claude-skill-search-first`, `claude-skill-stocktake`
+- **Siblings**: `claude-skill-llms-txt-writer`, `claude-skill-context-sync`, `claude-skill-search-first`, `claude-skill-stocktake`, `claude-skill-rules-distill`, `claude-skill-learn-eval`, `claude-skill-daily-research`
 - **Standard**: agentskills.io/specification
 
 ## Prior Research References
