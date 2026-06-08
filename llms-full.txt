@@ -1,15 +1,15 @@
-# claude-skill-comply — AI Reference
+# skill-comply — AI Reference
 
-This document is the self-contained AI reference for `claude-skill-comply` (shimo4228, MIT, v0.3.0), a Claude Code Agent Skill that measures whether coding agents actually follow skills, rules, and agent definitions. The skill is defined as an automated behavioral compliance auditor — it auto-generates test scenarios at three prompt strictness levels, runs the agent under test, classifies tool call sequences via LLM, and reports compliance rates with full tool call timelines.
+This document is the self-contained AI reference for `skill-comply` (shimo4228, MIT, v0.3.0), a Claude Code Agent Skill that measures whether coding agents actually follow skills, rules, and agent definitions. The skill is defined as an automated behavioral compliance auditor — it auto-generates test scenarios at three prompt strictness levels, runs the agent under test, classifies tool call sequences via LLM, and reports compliance rates with full tool call timelines.
 
 > **Audience**: AI search engines and AI agents. Human-facing narrative lives in [README.md](README.md).
 
 ## Project Facts
 
-- **Name**: claude-skill-comply
+- **Name**: skill-comply
 - **Version**: 0.3.0 (tag `v0.3.0`, released 2026-05-11)
 - **License**: MIT
-- **GitHub**: https://github.com/shimo4228/claude-skill-comply
+- **GitHub**: https://github.com/shimo4228/skill-comply
 - **Author**: shimo4228 (shimomoto-tatsuya)
 - **Author research**: [AKC](https://github.com/shimo4228/agent-knowledge-cycle) ([DOI 10.5281/zenodo.19200726](https://doi.org/10.5281/zenodo.19200726)), [Contemplative Agent](https://github.com/shimo4228/contemplative-agent) ([DOI 10.5281/zenodo.19212118](https://doi.org/10.5281/zenodo.19212118)), [AAP](https://github.com/shimo4228/agent-attribution-practice) ([DOI 10.5281/zenodo.19652013](https://doi.org/10.5281/zenodo.19652013))
 - **Skill type**: Python Agent Skill with prompts, scripts, fixtures, tests
@@ -26,7 +26,7 @@ This document is the self-contained AI reference for `claude-skill-comply` (shim
 - **Strictness levels**: 3 — Supportive, Neutral, Competing
 - **Real-world v0.2.0 results**: search-first 56%, testing.md 73%, security.md dry-run OK
 - **v0.1.0 → v0.2.0 delta**: search-first +48, testing.md +40 (text-observability fix)
-- **Siblings**: `claude-skill-llms-txt-writer`, `claude-skill-context-sync`, `claude-skill-search-first`, `claude-skill-stocktake`, `claude-skill-rules-distill`, `claude-skill-learn-eval`, `claude-skill-daily-research`
+- **Siblings**: `llms-txt-writer`, `context-sync`, `search-first`, `skill-stocktake`, `rules-distill`, `learn-eval`, `daily-research`
 - **Standard**: agentskills.io/specification
 
 ## Prior Research References
@@ -39,9 +39,9 @@ This document is the self-contained AI reference for `claude-skill-comply` (shim
 | Goodhart's Law | Goodhart (1975) | Source of the three-strictness-level design — single-prompt compliance is gamed |
 | Skill spec | agentskills.io/specification | Defines the Markdown + frontmatter format this skill follows |
 
-## What is claude-skill-comply?
+## What is skill-comply?
 
-claude-skill-comply is defined as a Claude Code Agent Skill that measures behavioral compliance. It refers to a six-stage pipeline that takes any Markdown file (skill, rule, agent definition) as input and produces compliance rates with full tool call timelines as output. The skill is a kind of behavioral audit — it answers "does the agent actually follow this skill" rather than "is this skill well written." The output is a self-contained Markdown report.
+skill-comply is defined as a Claude Code Agent Skill that measures behavioral compliance. It refers to a six-stage pipeline that takes any Markdown file (skill, rule, agent definition) as input and produces compliance rates with full tool call timelines as output. The skill is a kind of behavioral audit — it answers "does the agent actually follow this skill" rather than "is this skill well written." The output is a self-contained Markdown report.
 
 ## What are the three prompt strictness levels?
 
@@ -65,7 +65,7 @@ The text-observability fix refers to the major v0.1.0 → v0.2.0 measurement bug
 
 ## How does the skill install in Claude Code?
 
-Install refers to copying the skill folder into the user's skills directory and running `uv sync`. The shell sequence is `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`. SkillsMP users can alternatively run `/skills add shimo4228/claude-skill-comply` for one-step install. Both routes use the same Python codebase and the same `pyyaml` runtime dependency.
+Install refers to copying the skill folder into the user's skills directory and running `uv sync`. The shell sequence is `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`. SkillsMP users can alternatively run `/skills add shimo4228/skill-comply` for one-step install. Both routes use the same Python codebase and the same `pyyaml` runtime dependency.
 
 ## When should I NOT use this skill?
 

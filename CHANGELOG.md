@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Repository renamed to drop the `claude-skill-` prefix. This skill follows the
+  open Agent Skills standard and is not Claude-specific; the old name implied
+  otherwise. The previous URL redirects to the new one.
+- Added a `compatibility` frontmatter field (per the Agent Skills spec).
+- Updated sibling cross-references to the renamed sibling repositories.
+
 ## [0.3.0] — 2026-05-11
 
 ### Added

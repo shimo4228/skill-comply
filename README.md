@@ -1,4 +1,4 @@
-# claude-skill-comply
+# skill-comply
 
 An [Agent Skill](https://agentskills.io/specification) that measures whether coding agents actually **follow** skills, rules, and agent definitions. Auto-generates test scenarios at 3 prompt strictness levels, runs agents, classifies tool call sequences via LLM, and reports compliance rates with full timelines.
 
@@ -15,7 +15,7 @@ cd ~/.claude/skills/skill-comply && uv sync
 ### SkillsMP
 
 ```bash
-/skills add shimo4228/claude-skill-comply
+/skills add shimo4228/skill-comply
 ```
 
 ## How It Works
