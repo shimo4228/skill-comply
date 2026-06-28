@@ -1,6 +1,6 @@
 # skill-comply
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shimo4228/skill-comply)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shimo4228/skill-comply) [![GitMCP](https://img.shields.io/endpoint?url=https://gitmcp.io/badge/shimo4228/skill-comply)](https://gitmcp.io/shimo4228/skill-comply)
 
 An [Agent Skill](https://agentskills.io/specification) that measures whether coding agents actually **follow** skills, rules, and agent definitions. Auto-generates test scenarios at 3 prompt strictness levels, runs agents, classifies tool call sequences via LLM, and reports compliance rates with full timelines.
 
