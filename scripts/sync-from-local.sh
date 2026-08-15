@@ -76,7 +76,13 @@ find "$STAGING" \( -name results.json -o -name '*.log' -o -name '*.pyc' \
   -o -name .DS_Store -o -name .coverage -o -name '.coverage.*' \) -delete
 find "$STAGING" \( -name __pycache__ -o -name .pytest_cache -o -name .venv \
   -o -name node_modules -o -name .mypy_cache -o -name .ruff_cache \
-  -o -name htmlcov \) -type d -prune -exec rm -rf {} + 2>/dev/null || true
+  -o -name htmlcov -o -name results \) -type d -prune -exec rm -rf {} + 2>/dev/null || true
+# `results` is skill-comply's run-output directory (generated specs + reports).
+# The gitignore-honoring prune only catches what the source repo declines to track
+# (results/*.md); the generated *.spec.yaml files ARE tracked upstream, so they rode
+# into the payload — measurement records of the author's own skills, which a consumer
+# never uses. The aggregate claude-harness script already pruned this; the fix had not
+# propagated to the vendored copies (2026-08-15).
 
 # --- frontmatter YAML validation (GitHub / SkillsMP parse strictly; abort on invalid) ---
 if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; then
