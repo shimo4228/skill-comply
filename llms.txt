@@ -1,11 +1,13 @@
 # skill-comply
 
-> A Claude Code skill (MIT, v0.3.0) that measures whether coding agents actually follow skills, rules, and agent definitions. Auto-generates test scenarios at 3 prompt strictness levels, runs agents, classifies tool call sequences via LLM, and reports compliance rates with full timelines.
+> A Claude Code skill (MIT, v0.3.0) that measures whether coding agents actually follow skills and rules (agent-definition invocation cannot currently be observed: the child session has the Agent tool denied). Auto-generates test scenarios at 3 prompt strictness levels, runs agents, classifies their tool calls and text output via LLM, and reports compliance rates with full timelines.
+
+Status: active, synced one way from the author's Claude Code harness (`scripts/sync-from-local.sh`); the same skill also ships in the [akc-cycle](https://github.com/shimo4228/akc-cycle) plugin as `/akc-cycle:skill-comply`, and this repository can trail the plugin between syncs.
 
 ## Core documentation
 
 - [llms-full.txt](llms-full.txt): self-contained Q&A reference for AI agents (Project Facts, Prior Research, 9 question-form H2 sections)
-- [README.md](README.md): human-facing narrative (install, how it works, real-world results, v0.1.0 → v0.3.0 progression)
+- [README.md](README.md): human-facing narrative (install, how it works, v0.2.0 real-world results)
 - [SKILL.md](skills/skill-comply/SKILL.md): full skill specification — spec generation, scenario levels, classification, grading, models
 - [CHANGELOG.md](CHANGELOG.md): release notes v0.1.0 → v0.2.0 → v0.3.0
 
@@ -13,8 +15,8 @@
 
 - 6-stage pipeline: Spec Generation → Scenario Generation → Execution → Classification → Grading → Report
 - 3 prompt strictness levels: **Supportive** (prompt explicitly mentions the skill), **Neutral** (skill not mentioned), **Competing** (prompt contradicts the skill)
-- Model split: `--gen-model` (haiku default), `--model` (sonnet default for scenarios), `--classifier-model` (sonnet, 300s timeout)
-- 32 passing pytest tests in `skills/skill-comply/tests/`
+- Model split: `--gen-model` (haiku default), `--model` (sonnet default, the agent under test in scenario execution), `--classifier-model` (sonnet, 300s timeout)
+- pytest tests in `skills/skill-comply/tests/`
 
 ## Standard reference
 
@@ -29,4 +31,5 @@
 - [skill-stocktake](https://github.com/shimo4228/skill-stocktake): quality audit for skills and commands
 - [rules-distill](https://github.com/shimo4228/rules-distill): scan installed skills, extract cross-cutting principles, and distill them into rules
 - [learn-eval](https://github.com/shimo4228/learn-eval): extract reusable patterns from sessions, self-evaluate quality, and save to the right location
-- [daily-research](https://github.com/shimo4228/daily-research): cron-driven daily research digest — theme selection, multi-stage web research, LLM-as-Judge evaluation
+- [daily-research](https://github.com/shimo4228/daily-research): research feedback engine for your own repos — `claude -p` + macOS launchd writes daily reports per line
+- [shimo4228](https://github.com/shimo4228/shimo4228): the author's hub — the practice lines (AKC among them) and their DOIs

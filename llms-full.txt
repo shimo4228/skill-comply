@@ -1,6 +1,6 @@
 # skill-comply — AI Reference
 
-This document is the self-contained AI reference for `skill-comply` (shimo4228, MIT, v0.3.0), a Claude Code Agent Skill that measures whether coding agents actually follow skills, rules, and agent definitions. The skill is defined as an automated behavioral compliance auditor — it auto-generates test scenarios at three prompt strictness levels, runs the agent under test, classifies tool call sequences via LLM, and reports compliance rates with full tool call timelines.
+This document is the self-contained AI reference for `skill-comply` (shimo4228, MIT, v0.3.0), a Claude Code Agent Skill that measures whether coding agents actually follow skills and rules (agent-definition invocation cannot currently be observed: the child session has the Agent tool denied). The skill is defined as an automated behavioral compliance auditor — it auto-generates test scenarios at three prompt strictness levels, runs the agent under test, classifies the agent's tool calls and text output via LLM, and reports compliance rates with full tool call timelines.
 
 > **Audience**: AI search engines and AI agents. Human-facing narrative lives in [README.md](README.md).
 
@@ -11,20 +11,22 @@ This document is the self-contained AI reference for `skill-comply` (shimo4228, 
 - **License**: MIT
 - **GitHub**: https://github.com/shimo4228/skill-comply
 - **Author**: shimo4228 (shimomoto-tatsuya)
-- **Author research**: [AKC](https://github.com/shimo4228/agent-knowledge-cycle) ([DOI 10.5281/zenodo.19200726](https://doi.org/10.5281/zenodo.19200726)), [Contemplative Agent](https://github.com/shimo4228/contemplative-agent) ([DOI 10.5281/zenodo.19212118](https://doi.org/10.5281/zenodo.19212118)), [AAP](https://github.com/shimo4228/agent-attribution-practice) ([DOI 10.5281/zenodo.19652013](https://doi.org/10.5281/zenodo.19652013))
+- **Author research**: this skill belongs to the Measure phase of [AKC](https://github.com/shimo4228/agent-knowledge-cycle) ([DOI 10.5281/zenodo.19200726](https://doi.org/10.5281/zenodo.19200726)); the author's practice lines and their DOIs are listed on the hub https://github.com/shimo4228/shimo4228
+- **Status**: active, synced one way from the author's Claude Code harness by `scripts/sync-from-local.sh`; also shipped in the akc-cycle plugin, so this repository can trail the plugin between syncs
 - **Skill type**: Python Agent Skill with prompts, scripts, fixtures, tests
 - **Runtime**: Python 3.11+, `uv` package manager
 - **Runtime deps**: `pyyaml>=6.0`
 - **Dev deps**: `pytest>=9.0.2`
 - **Layout**: `skills/skill-comply/{SKILL.md, scripts/, prompts/, tests/, fixtures/}`
-- **Install**: `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`
-- **CLI**: `uv run python -m scripts.run <path>` plus `--gen-model`, `--model`, `--classifier-model`, `--dry-run`
+- **Install**: `git clone https://github.com/shimo4228/skill-comply && mkdir -p ~/.claude/skills && cp -r skill-comply/skills/skill-comply ~/.claude/skills/skill-comply` (or the akc-cycle plugin, as `/akc-cycle:skill-comply`)
+- **CLI**: `uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run <path>` plus `--gen-model`, `--model`, `--classifier-model`, `--dry-run`, `--spec`, `--concurrency`, `--allow-bash`, `--load-target-skill`, `--output`
+- **Claude usage**: every stage except grading and the report calls `claude -p`; at least eight sessions per full run, two per dry run
 - **Default models**: `--gen-model haiku`, `--model sonnet`, `--classifier-model sonnet`
 - **Classifier timeout**: 300 seconds
-- **Tests**: 32 passing (unit)
+- **Tests**: pytest unit tests in `skills/skill-comply/tests/`
 - **Pipeline stages**: 6 — Spec, Scenario, Execution, Classification, Grading, Report
 - **Strictness levels**: 3 — Supportive, Neutral, Competing
-- **Real-world v0.2.0 results**: search-first 56%, testing.md 73%, security.md dry-run OK
+- **Real-world v0.2.0 results**: search-first 56%, testing.md 73%
 - **v0.1.0 → v0.2.0 delta**: search-first +48, testing.md +40 (text-observability fix)
 - **Siblings**: `llms-txt-writer`, `context-sync`, `search-first`, `skill-stocktake`, `rules-distill`, `learn-eval`, `daily-research`
 - **Standard**: agentskills.io/specification
@@ -49,11 +51,11 @@ The three levels are defined as Supportive (prompt explicitly mentions the skill
 
 ## What are the six pipeline stages?
 
-The six stages are defined as Spec Generation (LLM extracts expected behavioral steps from the target Markdown), Scenario Generation (creates three scenarios with decreasing prompt support), Execution (runs `claude -p` in a sandbox, captures tool call traces via stream-json), Classification (LLM classifies tool calls against spec steps), Grading (deterministic temporal-order validation), and Report (self-contained Markdown with rates and timelines). The classification stage is the load-bearing one.
+The six stages are defined as Spec Generation (LLM extracts expected behavioral steps from the target Markdown), Scenario Generation (creates three scenarios with decreasing prompt support), Execution (runs `claude -p` in a sandbox, captures tool calls and text output via stream-json), Classification (LLM matches tool calls and text output against spec steps), Grading (deterministic temporal-order validation), and Report (self-contained Markdown with rates and timelines). The classification stage is the load-bearing one.
 
 ## What is the v0.3.0 model split?
 
-The model split is defined as three independent CLI flags: `--gen-model` (default haiku, used for spec and scenario generation), `--model` (default sonnet, used for scenario execution — the agent under test), and `--classifier-model` (default sonnet, used for trace classification with a 300-second timeout). The split refers to the v0.3.0 change. Haiku is too fast and times out on long traces.
+The model split is defined as three independent CLI flags: `--gen-model` (default haiku, used for spec and scenario generation), `--model` (default sonnet, used for scenario execution — the agent under test), and `--classifier-model` (default sonnet, used for trace classification with a 300-second timeout). The split refers to the v0.3.0 change. Haiku timed out as classifier on long traces.
 
 ## Why did v0.3.0 raise the classifier model and timeout?
 
@@ -65,11 +67,11 @@ The text-observability fix refers to the major v0.1.0 → v0.2.0 measurement bug
 
 ## How does the skill install in Claude Code?
 
-Install refers to copying the skill folder into the user's skills directory and running `uv sync`. The shell sequence is `cp -r skills/skill-comply ~/.claude/skills/skill-comply && cd ~/.claude/skills/skill-comply && uv sync`. SkillsMP users can alternatively run `/skills add shimo4228/skill-comply` for one-step install. Both routes use the same Python codebase and the same `pyyaml` runtime dependency.
+Install refers to copying the skill folder into the user's skills directory; `uv` installs PyYAML on the first `uv run --frozen`. The shell sequence is `git clone https://github.com/shimo4228/skill-comply && cp -r skill-comply/skills/skill-comply ~/.claude/skills/skill-comply`. The akc-cycle Claude Code plugin ships the same skill as `/akc-cycle:skill-comply`.
 
 ## When should I NOT use this skill?
 
-This skill should not be used on Markdown files that contain no behavioral specification (essays, ADRs, release notes) — there is no compliance to measure. It is a kind of behavioral audit and so depends on the input having observable behavior steps. The skill also costs LLM tokens for every run; trivial or low-stakes skills do not justify the audit overhead. Use it on load-bearing skills and rules.
+This skill should not be used on Markdown files that contain no behavioral specification (essays, ADRs, release notes) — there is no compliance to measure. It is a kind of behavioral audit and so depends on the input having observable behavior steps. The skill also starts at least eight `claude -p` sessions per full run, drawing on the user's Claude usage; trivial or low-stakes skills do not justify the audit overhead. Use it on load-bearing skills and rules.
 
 ## How does this skill relate to skill authoring?
 
@@ -77,4 +79,4 @@ The relationship means this skill is the verification end of the skill lifecycle
 
 ## Who is shimo4228?
 
-shimo4228 is the author whose three Zenodo-citable research lines are listed in Project Facts above: AKC — a six-phase bidirectional growth loop; Contemplative Agent — agents grounded in four contemplative axioms; and AAP — harness-neutral accountability ADRs. This skill is defined as scaffolding for the **Measure** phase of AKC.
+shimo4228 is the author; the hub at https://github.com/shimo4228/shimo4228 lists the author's long-running practice lines and their DOIs, AKC (a six-phase bidirectional growth loop) among them. This skill is defined as scaffolding for the **Measure** phase of AKC.
