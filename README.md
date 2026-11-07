@@ -37,17 +37,17 @@ The same skill also ships in the [akc-cycle](https://github.com/shimo4228/akc-cy
 
 ## Usage
 
-Ask Claude Code in plain words, such as "measure whether my testing rule is followed", or type `/skill-comply` with the path. The skill runs the same script you can run yourself. The commands below are for the clone install: `--project` points `uv` at the installed skill folder and `--frozen` installs from its lockfile unchanged. With the plugin, run it through Claude Code as `/akc-cycle:skill-comply`; the plugin keeps the skill in its own install folder, and the reports go to that folder's `results/`.
+Ask Claude Code in plain words, such as "measure whether my boundary rule is followed", or type `/skill-comply` with the path. The skill runs the same script you can run yourself. The commands below are for the clone install: `--project` points `uv` at the installed skill folder and `--frozen` installs from its lockfile unchanged. With the plugin, run it through Claude Code as `/akc-cycle:skill-comply`; the plugin keeps the skill in its own install folder, and the reports go to that folder's `results/`.
 
 ```bash
 # Dry run: generates the spec and the 3 scenarios, then stops before any agent runs
 uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run --dry-run ~/.claude/skills/search-first/SKILL.md
 
 # Full run
-uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run ~/.claude/rules/common/testing.md
+uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run ~/.claude/rules/common/boundary.md
 
 # Custom models
-uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run --gen-model haiku --model sonnet ~/.claude/rules/common/testing.md
+uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run --gen-model haiku --model sonnet ~/.claude/rules/common/boundary.md
 ```
 
 The report goes to `~/.claude/skills/skill-comply/results/<skill-name>.md`, and the generated spec to `results/<skill-name>.spec.yaml`; pass it back with `--spec` to keep the same steps when you re-measure. The skill's [SKILL.md](skills/skill-comply/SKILL.md) covers the other flags (`--concurrency`, `--allow-bash`, `--load-target-skill`) and how project skills are measured.
@@ -113,7 +113,7 @@ It exists because a rule that reads well can still be ignored, and only a run sh
 
 Canonical facts: MIT license; Python 3.11+ run through `uv` (PyYAML is the only runtime dependency and pytest the only dev dependency; version in `skills/skill-comply/pyproject.toml`), with pytest tests in `skills/skill-comply/tests/`; maintained by one author (@shimo4228). Status: active, synced one way from the author's Claude Code harness by `scripts/sync-from-local.sh` (it never commits), and also shipped in the akc-cycle plugin as `/akc-cycle:skill-comply`, so this repository can trail the plugin between syncs. Requirements: the Claude Code CLI; spec generation, scenario generation, execution and classification call `claude -p` (at least eight sessions per full run and two per dry run, one fewer when a saved spec is reused with `--spec`, more when spec generation retries a reply that does not parse; grading and the report are plain code), which uses the user's Claude usage (no separate API key). Default models: `--gen-model haiku` for spec and scenario generation, `--model sonnet` for the agent under test, `--classifier-model sonnet` for classification. Supported targets: skills and rules; an agent definition is accepted, but whether the agent gets invoked cannot currently be observed, because every child session has the `Agent` tool denied, so such a step scores 0% as unobservable. The child agent runs in `/tmp/skill-comply-sandbox/` with Bash denied unless `--allow-bash` is passed; the target file is treated as untrusted. Reports and specs are written to the skill folder's `results/`.
 
-Example: `uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run ~/.claude/rules/common/testing.md` writes `results/testing.md` with the generated spec, the three scenario prompts, a compliance score per scenario, the tool call timelines with classification labels, and hook-promotion suggestions for low-compliance steps. On v0.2.0 the author measured testing.md at 73% overall (100% supportive) and search-first at 56% overall (67% supportive).
+Example: `uv run --frozen --project ~/.claude/skills/skill-comply python -m scripts.run ~/.claude/rules/common/boundary.md` writes `results/boundary.md` with the generated spec, the three scenario prompts, a compliance score per scenario, the tool call timelines with classification labels, and hook-promotion suggestions for low-compliance steps. On v0.2.0 the author measured testing.md at 73% overall (100% supportive) and search-first at 56% overall (67% supportive).
 
 Links: [skills/skill-comply/SKILL.md](skills/skill-comply/SKILL.md) is the skill itself; [CHANGELOG.md](CHANGELOG.md) holds the release history; [llms.txt](llms.txt) and [llms-full.txt](llms-full.txt) are the machine-readable summary and reference. The skill implements part of the Measure phase of the [Agent Knowledge Cycle (AKC)](https://github.com/shimo4228/agent-knowledge-cycle), concept DOI [10.5281/zenodo.19200726](https://doi.org/10.5281/zenodo.19200726); cite AKC by that DOI. The installable form of the whole cycle is [akc-cycle](https://github.com/shimo4228/akc-cycle).
 
