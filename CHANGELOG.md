@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- The Models table left `SKILL.md`; `--help` shows each flag's default.
 - Repository renamed to drop the `claude-skill-` prefix. This skill follows the
   open Agent Skills standard and is not Claude-specific; the old name implied
   otherwise. The previous URL redirects to the new one.
